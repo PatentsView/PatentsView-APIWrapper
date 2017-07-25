@@ -8,13 +8,15 @@ and merge the results into a CSV file.
 
 ## How To Use the API Wrapper
 1. Clone or download this repository
-2. Modify the *"config.cfg"* file to point to your input file(s) and specify 
-    your queries.
-3. Run the API Wrapper using Python 3
+2. Install dependencies
+3. Modify the configuration file *"config.cfg"* file to point to your input 
+    file(s) and specify your queries.
+4. Run the API Wrapper using Python 3
 
 
 ```powershell
 git clone https://github.com/CSSIP-AIR/PatentsView-APIWrapper.git
+pip install -r requirements.txt
 cd PatentsView-APIWrapper
 python api_wrapper.py
 ```
@@ -29,11 +31,11 @@ numbers), each separated by a new line. The file *"sample_file.txt"* provides an
 example of the correct format.
 
 ### Configuration File
-Specify queries in the *"config.cfg"* file. To do so, modify the required and 
+Specify queries in the configuration file *"config.cfg"*. To do so, modify the required and 
 optional parameters to point to the input file and specify the fields and 
 criteria applied to the search.
 
-###### Required Parameters:
+#### Required Parameters:
 
 - __*\[QUERY_NAME\]*__: defines the query that will be made. Multiple queries 
 may be specified, as shown in the example configuration file *"config.cfg"*.
@@ -58,7 +60,7 @@ Common input types include:
 
 - __*fields*__: a list of fields to be included in the resulting output
 
-###### Optional Parameters:
+#### Optional Parameters:
 Optional parameters can be commented out or deleted if not in use.
 
 - sort: the field over which the output file will be sorted 
@@ -79,7 +81,7 @@ criterion may be written using an OR operator with multiple criteria. For exampl
 	A full syntax guide for specifying criteria can be found at the 
     [PatentsView Query Language](http://www.patentsview.org/api/query-language.html) page.
 	 
-###### Example
+#### Example
 
 This example will query the **patents** endpoint for each **patent_number** in 
 **"C:/path/to/input_file/sample_file.txt"** for patents from **2015 or earlier**. 
