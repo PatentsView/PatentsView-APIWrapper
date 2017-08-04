@@ -72,11 +72,14 @@ def query(configfile):
 
         # Clean csv: reorder columns, drop duplicates, sort, then save
         output_filename = os.path.join(directory, q+'.csv')
-        df = pd.read_csv(output_filename)
+        df = pd.read_csv(output_filename, encoding='Latin-1')
         df = df[fields].drop_duplicates().sort_values(by=sort_fields, 
                 ascending=[direction != 'desc' for direction in sort_directions])
         df.to_csv(output_filename, index=False)
 
 
 if __name__ == '__main__':
+    if sys.version_info[0] != 3:
+        print("Please use Python version 3; you are using version:", sys.version)
+        sys.exit()
     query('config.cfg')

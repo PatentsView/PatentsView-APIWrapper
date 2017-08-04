@@ -46,7 +46,7 @@ def convertToCSV(jsonData, keys):
     return returnData
  
 def writeCSV(a, filename):
-    write = csv.writer(io.open(filename, 'w', newline='', encoding='utf-8'))
+    write = csv.writer(io.open(filename, 'w', newline='', encoding='Latin-1'))
     groups = ["cited_patents","inventors","application_citations",
                 "applications", "assignees","citedby_patents","coinventors",
                 "cpc_subgroups", "cpc_subsections", "cpcs", "IPCs", 
@@ -80,10 +80,7 @@ def writeCSV(a, filename):
                         flag = True
                 if (flag):
                     try:
-                        if sys.version_info >= (3,):
-                            row = [str(s).encode("utf-8", "replace").decode('cp1252') for s in row]
-                        else:
-                            row = [unicode(s).encode("utf-8", "replace").decode('cp1252') for s in row]
+                        row = [str(s).encode("Latin-1", "replace").decode('cp1252') for s in row]
                     except:
                         pass
                     write.writerow(row)
@@ -95,7 +92,7 @@ def merge_csv(fd,q,requests):
     for line in open(os.path.join(fd,q+'_0.csv')):
         csv_out.write(line)
     for i in range(requests):
-        f = open(os.path.join(fd, q+'_'+str(i)+'.csv'), 'r+', encoding='utf-8')
+        f = open(os.path.join(fd, q+'_'+str(i)+'.csv'), 'r+', encoding='Latin-1')
         if sys.version_info >= (3,):
             next(f)
         else:
