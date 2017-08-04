@@ -61,9 +61,18 @@ Common input types include:
 - __*fields*__: a list of fields to be included in the resulting output
 
 #### Optional Parameters:
-Optional parameters can be commented out or deleted if not in use.
+Optional parameters can be commented out with a hash sign (#) or deleted if not in use.
 
-- sort: the field over which the output file will be sorted 
+- sort: the fields and directions over which the output file will be sorted.
+This should be specified as an array of JSON objects. For example:
+
+    To sort just by patent number (ascending):
+
+      sort = [{"patent_number": "asc"}]
+
+    To sort first by patent_date (descending), and then by patent title (ascending):
+
+      sort = [{"patent_date": "desc"}, {"patent_title":, "asc"}]
 
 - __*criteria1, criteria2, ...*__ : allow for additional criteria to be applied to 
 the query. Multiple criteria are combined with AND operators, but a single 
@@ -71,12 +80,12 @@ criterion may be written using an OR operator with multiple criteria. For exampl
 
     To limit results to patents from Jan. 1, 2014 to Dec. 31, 2016.
 
-      criteria1 = {"_gte":{"patent_date":"2014-01-01"}
-      criteria2 = {"_lte":{"patent_date":"2016-12-31"}
+      criteria1 = {"_gte":{"patent_date":"2014-01-01"}}
+      criteria2 = {"_lte":{"patent_date":"2016-12-31"}}
 
     To limit results to patents before Jan. 1, 2014 OR after Dec. 31, 2016.
 
-      criteria1 = {"_or":[{"_lte":{"patent_date":"2014-01-01"}, {"_gte":{"patent_date":"2016-12-31"}]}
+      criteria1 = {"_or":[{"_lt":{"patent_date":"2014-01-01"}, {"_gt":{"patent_date":"2016-12-31"}]}
 
 	A full syntax guide for specifying criteria can be found at the 
     [PatentsView Query Language](http://www.patentsview.org/api/query-language.html) page.
@@ -99,3 +108,15 @@ criteria1 = {"_lte":{"patent_date":"2015-12-31"}}
 # criteria2 = 
 sort = "patent_number"
 ```
+
+### Compatibility
+
+The API wrapper is currently compatible with Python 3.
+
+### See also
+
+[USPTO PatentsView](http://www.patentsview.org/web/#viz/relationships)
+
+[PatentsView API](http://www.patentsview.org/api/doc.html)
+
+[PatentsView Query Language](http://www.patentsview.org/api/query-language.html)

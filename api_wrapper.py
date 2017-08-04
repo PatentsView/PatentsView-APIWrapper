@@ -26,9 +26,23 @@ def query(configfile):
         fields = json.loads(parser.get(q, 'fields'))
 
         try:
+            # If specified, 'sort' should be a list of dictionaries, specifying 
+            # the order of keys and direction of each key.
+
             sort = json.loads(parser.get(q, 'sort'))
+            sort_fields, sort_directions = [], []
+            for dct in sort:
+                for field in dct:
+                    # We can only sort by fields that are in the data
+                    if field in fields:
+                        sort_fields.append(field)
+                        sort_directions.append(dct[field])
+            if len(sort_fields) == 0:
+                sort = [fields[0]]
+                sort_directions = ["asc"]
         except:
-            sort = fields[0]
+            sort = [fields[0]]
+            sort_directions = ["asc"]
 
         criteria = {"_and": [json.loads(parser.get(q, option)) for option in
                         parser.options(q) if option.startswith('criteria')]}
@@ -59,7 +73,8 @@ def query(configfile):
         # Clean csv: reorder columns, drop duplicates, sort, then save
         output_filename = os.path.join(directory, q+'.csv')
         df = pd.read_csv(output_filename)
-        df = df[fields].drop_duplicates().sort_values(by=sort)
+        df = df[fields].drop_duplicates().sort_values(by=sort_fields, 
+                ascending=[direction != 'desc' for direction in sort_directions])
         df.to_csv(output_filename, index=False)
 
 
