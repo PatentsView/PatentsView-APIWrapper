@@ -16,6 +16,8 @@ def query(configfile):
     # Loop through the separate queries listed in the config file.
     for q in parser.sections():
 
+        print("Running query: ", q)
+
         # Parse parameters from config file
         entity = json.loads(parser.get(q, 'entity'))
         url = 'http://www.patentsview.org/api/'+entity+'/query?'
@@ -60,22 +62,30 @@ def query(configfile):
 
             r = requests.post(url, data=json.dumps(params))
 
-            if json.loads(r.text)['count'] != 0:
-                outp = open(os.path.join(directory, q + '_' + \
-                            str(results_found) + '.json'), 'w')
-                print(r.text, end = '', file=outp)
-                outp.close()
-                results_found += 1
+            if 400 <= r.status_code <= 499:
+                print("Client error when quering for value {}".format(item))
+            elif r.status_code >= 500:
+                print("Server error when quering for value {}. You may be exceeding the maximum API request size (1GB).".format(item))
+            elif json.loads(r.text)['count'] != 0:
+                    outp = open(os.path.join(directory, q + '_' + \
+                                str(results_found) + '.json'), 'w')
+                    print(r.text, end = '', file=outp)
+                    outp.close()
+                    results_found += 1
 
-        # Output merged CSV of formatted results.
-        json_to_csv.main(directory, q, results_found)
+        if results_found == 0:
+            print("Query {} returned no results".format(q))
+        else:
+            # Output merged CSV of formatted results.
+            json_to_csv.main(directory, q, results_found)
 
-        # Clean csv: reorder columns, drop duplicates, sort, then save
-        output_filename = os.path.join(directory, q+'.csv')
-        df = pd.read_csv(output_filename, encoding='Latin-1')
-        df = df[fields].drop_duplicates().sort_values(by=sort_fields, 
-                ascending=[direction != 'desc' for direction in sort_directions])
-        df.to_csv(output_filename, index=False)
+            # Clean csv: reorder columns, drop duplicates, sort, then save
+            output_filename = os.path.join(directory, q+'.csv')
+            df = pd.read_csv(output_filename, dtype=object, encoding='Latin-1')
+            df = df[fields].drop_duplicates().sort_values(by=sort_fields,
+                    ascending=[direction != 'desc' for direction in sort_directions])
+            df.to_csv(output_filename, index=False)
+            print('({} rows returned)'.format(len(df)))
 
 
 if __name__ == '__main__':
