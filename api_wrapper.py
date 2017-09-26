@@ -27,6 +27,7 @@ def query(configfile):
         input_type = json.loads(parser.get(q, 'input_type'))
         fields = json.loads(parser.get(q, 'fields'))
 
+
         try:
             # If specified, 'sort' should be a list of dictionaries, specifying 
             # the order of keys and direction of each key.
@@ -40,10 +41,10 @@ def query(configfile):
                         sort_fields.append(field)
                         sort_directions.append(dct[field])
             if len(sort_fields) == 0:
-                sort = [fields[0]]
+                sort_fields = [fields[0]]
                 sort_directions = ["asc"]
         except:
-            sort = [fields[0]]
+            sort_fields = [fields[0]]
             sort_directions = ["asc"]
 
         criteria = {"_and": [json.loads(parser.get(q, option)) for option in
