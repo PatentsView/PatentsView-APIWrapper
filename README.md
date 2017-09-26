@@ -16,8 +16,8 @@ and merge the results into a CSV file.
 
 ```powershell
 git clone https://github.com/CSSIP-AIR/PatentsView-APIWrapper.git
-pip install -r requirements.txt
 cd PatentsView-APIWrapper
+pip install -r requirements.txt
 python api_wrapper.py
 ```
 
@@ -106,7 +106,7 @@ input_type = "patent_number"
 fields = ["patent_number", "patent_title", "patent_date"]
 criteria1 = {"_lte":{"patent_date":"2015-12-31"}}
 # criteria2 = 
-sort = "patent_number"
+sort = [{"patent_number": "asc"}]
 ```
 
 ### Compatibility
