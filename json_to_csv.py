@@ -5,7 +5,8 @@ import sys
 import csv
 import io
 
- 
+ENCODING = "Latin-1"
+
 def convertToCSV(jsonData, keys):
     returnData = {}
     global counter
@@ -46,7 +47,7 @@ def convertToCSV(jsonData, keys):
     return returnData
  
 def writeCSV(a, filename):
-    write = csv.writer(io.open(filename, 'w', newline='', encoding='Latin-1'))
+    write = csv.writer(io.open(filename, 'w', newline='', encoding=ENCODING))
     groups = ["cited_patents","inventors","application_citations",
                 "applications", "assignees","citedby_patents","coinventors",
                 "cpc_subgroups", "cpc_subsections", "cpcs", "IPCs", 
@@ -80,7 +81,7 @@ def writeCSV(a, filename):
                         flag = True
                 if (flag):
                     try:
-                        row = [str(s).encode("Latin-1", "replace").decode('cp1252') for s in row]
+                        row = [str(s).encode(ENCODING, "replace").decode(ENCODING, errors='ignore') for s in row]
                     except:
                         pass
                     write.writerow(row)
@@ -89,10 +90,10 @@ def writeCSV(a, filename):
 def merge_csv(fd,q,requests):
     diri = [d for d in os.listdir(fd) if re.search(q+'_\d+.csv',d)]
     csv_out = open(os.path.join(fd, q+'.csv'), 'w')
-    for line in open(os.path.join(fd,q+'_0.csv')):
+    for line in open(os.path.join(fd,q+'_0.csv'), 'rb').read().decode(ENCODING, errors='ignore'):
         csv_out.write(line)
     for i in range(requests):
-        f = open(os.path.join(fd, q+'_'+str(i)+'.csv'), 'r+', encoding='Latin-1')
+        f = open(os.path.join(fd, q+'_'+str(i)+'.csv'), 'r+', encoding=ENCODING)
         if sys.version_info >= (3,):
             next(f)
         else:
