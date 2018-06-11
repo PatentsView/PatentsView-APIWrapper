@@ -61,7 +61,9 @@ def query(configfile):
                 'f': fields 
                 }
 
+            print("Starting query request")
             r = requests.post(url, data=json.dumps(params))
+            print("Done with query request")
 
             if 400 <= r.status_code <= 499:
                 print("Client error when quering for value {}".format(item))
@@ -92,5 +94,13 @@ def query(configfile):
 if __name__ == '__main__':
     if sys.version_info[0] != 3:
         print("Please use Python version 3; you are using version:", sys.version)
-        sys.exit()
-    query('config.cfg')
+        sys.exit(1)
+
+    if len(sys.argv) < 2:
+        print("USAGE: python api_wrapper.py config_file")
+        sys.exit(1)
+
+    if not os.path.isfile(sys.argv[1]):
+        print("File not found: ", sys.argv[1])
+
+    query(sys.argv[1])
