@@ -8,112 +8,98 @@ and merge the results into a CSV file.
 
 ## How To Use the API Wrapper
 1. Clone or download this repository
-2. Install dependencies
-3. Modify the configuration file *"config.cfg"* file to point to your input 
-    file(s) and specify your queries.
-4. Run the API Wrapper using Python 3
-
-
-```powershell
+```bash
 git clone https://github.com/CSSIP-AIR/PatentsView-APIWrapper.git
+```
+
+2. Install dependencies
+```bash
 cd PatentsView-APIWrapper
 pip install -r requirements.txt
-python api_wrapper.py
 ```
 
-## How to specify a query
-The PatentsView API Wrapper reads in query specifications from the configuration
-file *"config.cfg"*, in which you may specify where the input list of values to query can be found. 
+3. Modify the sample config file `sample_config.cfg` or create a copy with your own configuration settings
 
-### Input file(s)
-Input files must be text files containing a list of values (such as patent 
-numbers), each separated by a new line. The file *"sample_file.txt"* provides an
-example of the correct format.
+4. Run the API Wrapper using Python 3:
+```bash
+python api_wrapper.py sample_config.cfg
+```
 
-### Configuration File
-Specify queries in the configuration file *"config.cfg"*. To do so, modify the required and 
-optional parameters to point to the input file and specify the fields and 
-criteria applied to the search.
+## How to modify your query configuration file
+The PatentsView API Wrapper reads in query specifications from the configuration file you point it to. The configuration file should define at least one query. Below is a description of each parameter that defines each query.
 
-#### Required Parameters:
+### Query Name
+The name of the query, and the name given to the resulting file (for example, [QUERY1] produces QUERY1.csv). If your configuration file contains multiple queries, each query should have a distinct name. Query parameters must directly follow the query name. 
 
-- __*\[QUERY_NAME\]*__: defines the query that will be made. Multiple queries 
-may be specified, as shown in the example configuration file *"config.cfg"*.
+### Entity
+The type of object you want to return. This must be one of the PatentsView API endpoints:
+```
+    "patents"
+    "inventors"
+    "assignees"
+    "locations"
+    "cpc_subsections"
+    "uspc_mainclasses"
+    "nber_subcategories"
+```
 
-- __*entity*__: the type of object that will be returned. Must be one of: 
+### Input File
+The name or relative path of the input file containing the values you want to query. For example, `sample_config.cfg` points to `sample_patents.txt`, which contains a list of patent numbers; the API wrapper will query for each of these patents.
 
-      ["patents", "inventors", "assignees", "locations", "cpc_subsections", 
-      "uspc_mainclasses", "nber_subcategories"]
+### Directory
+The absolute path of the directory of your input file and results. Use forward slashes (`/`) instead of backward slashes (`\`). For Windows, this may look like:
 
-- __*directory*__: the folder containing the input list of values to query
+```directory = "/Users/jsennett/Code/PatentsView-APIWrapper"```
 
-- __*input_file*__: the filename of the input list of values to query. The input 
-file should be a text file with a list of values separated by newlines.
+For OSX/Unix systems:
 
-- __*input_type*__: the type of value in the input_file. The full lists of 
-input_types can be found in the 
-[PatentsView API Documentation](http://www.patentsview.org/api/doc.html). 
+```directory = "C:/Users/jsennett/Code/PatentsView-APIWrapper"```
+
+### Input Type
+The type of object represented in the input file. The full list of 
+input types can be found in the [PatentsView API Documentation](http://www.patentsview.org/api/doc.html). 
 Common input types include:
 
-      ["patent_number", "inventor_id", "assignee_id", "cpc_subsection_id", 
-      "location_id", "uspc_mainclass_id"]
-
-- __*fields*__: a list of fields to be included in the resulting output
-
-#### Optional Parameters:
-Optional parameters can be commented out with a hash sign (#) or deleted if not in use.
-
-- sort: the fields and directions over which the output file will be sorted.
-This should be specified as an array of JSON objects. For example:
-
-    To sort just by patent number (ascending):
-
-      sort = [{"patent_number": "asc"}]
-
-    To sort first by patent_date (descending), and then by patent title (ascending):
-
-      sort = [{"patent_date": "desc"}, {"patent_title":, "asc"}]
-
-- __*criteria1, criteria2, ...*__ : allow for additional criteria to be applied to 
-the query. Multiple criteria are combined with AND operators, but a single 
-criterion may be written using an OR operator with multiple criteria. For example:
-
-    To limit results to patents from Jan. 1, 2014 to Dec. 31, 2016.
-
-      criteria1 = {"_gte":{"patent_date":"2014-01-01"}}
-      criteria2 = {"_lte":{"patent_date":"2016-12-31"}}
-
-    To limit results to patents before Jan. 1, 2014 OR after Dec. 31, 2016.
-
-      criteria1 = {"_or":[{"_lt":{"patent_date":"2014-01-01"}, {"_gt":{"patent_date":"2016-12-31"}]}
-
-	A full syntax guide for specifying criteria can be found at the 
-    [PatentsView Query Language](http://www.patentsview.org/api/query-language.html) page.
-	 
-#### Example
-
-This example will query the **patents** endpoint for each **patent_number** in 
-**"C:/path/to/input_file/sample_file.txt"** for patents from **2015 or earlier**. 
-The resulting output will be called **"QUERY1.csv"**, with **"patent_number", 
-"patent_title",** and **"patent_date"** sorted by the **patent_number** column.
-
-```cfg
-[QUERY1]
-entity = "patents"
-input_file = "sample_file.txt"
-directory = "C:/path/to/input_file"
-input_type = "patent_number"
-fields = ["patent_number", "patent_title", "patent_date"]
-criteria1 = {"_lte":{"patent_date":"2015-12-31"}}
-# criteria2 = 
-sort = [{"patent_number": "asc"}]
+```
+    "patent_number"
+    "inventor_id"
+    "assignee_id"
+    "cpc_subsection_id"
+    "location_id"
+    "uspc_mainclass_id"
 ```
 
-### Compatibility
+### Fields
+The fields that will be returned in the results. Valid fields for each endpoint can be found in the [PatentsView API Documentation](http://www.patentsview.org/api/doc.html). Fields should be specified as an array of strings, such as:
+
+```fields = ["patent_number", "patent_title", "patent_date"]```
+
+
+### Criteria (optional)
+Additional rules, written in the PatentsView API syntax, to be applied to each query. Each criteria can specify multiple rules combined with OR or AND operators. If multiple criteria are listed, they will be combined with the AND operator. Multiple criteria should be named criteria1, criteria2, criteria3, etc.
+
+For example, the following criteria will limit results to patents from Jan 1 to Dec 31, 2015 with a patent abstract containing either "cell" or "mobile".
+```
+criteria1 = {"_gte":{"patent_date":"2015-1-1"}}
+criteria2 = {"_lte":{"patent_date":"2015-12-31"}}
+criteria3 = {"_or":[{"_contains":{"patent_abstract":"cell"}, {"_contains":{"patent_abstract":"mobile"}]}
+```
+
+### Sort (optional)
+The fields and directions over which the output file will be sorted. This should be specified as an array of JSON objects, pairing the field with its direction. The sort order will follow the array order.
+To sort just by patent number (ascending):
+
+```sort = [{"patent_number": "asc"}]```
+
+To sort first by patent_date (descending), and then by patent title (ascending):
+
+```sort = [{"patent_date": "desc"}, {"patent_title":, "asc"}]```
+
+## Compatibility
 
 The API wrapper is currently compatible with Python 3.
 
-### See also
+## See also
 
 [USPTO PatentsView](http://www.patentsview.org/web/#viz/relationships)
 
