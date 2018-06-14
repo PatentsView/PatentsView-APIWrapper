@@ -61,9 +61,7 @@ def query(configfile):
                 'f': fields 
                 }
 
-            print("Starting query request")
             r = requests.post(url, data=json.dumps(params))
-            print("Done with query request")
 
             if 400 <= r.status_code <= 499:
                 print("Client error when quering for value {}".format(item))
