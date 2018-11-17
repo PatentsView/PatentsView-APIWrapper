@@ -55,10 +55,11 @@ def query(configfile):
 
         item_list_len = len(item_list)
         # request the maximum of 10000 matches per query and page forward as necessary
-        count = per_page = 10000
+        per_page = 10000
         page = 1
 
         for item in item_list:
+            count = per_page
             while count == per_page:
                 params = {
                     'q': {"_and": [{input_type: item}, criteria]},
