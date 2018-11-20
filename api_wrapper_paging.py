@@ -54,35 +54,49 @@ def query(configfile):
         results_found = 0
 
         item_list_len = len(item_list)
-        print(item_list)
+        # request the maximum of 10000 matches per query and page forward as necessary
+        count = per_page = 10000
+        page = 1
+        #print(item_list_len)
+        #print(item_list)
         for item in item_list:
             print("item is", item)
-            params = {
-                'q': {"_and": [{input_type: item}, criteria]},
-                'f': fields 
-                }
-            print(json.dumps(params))
-            r = requests.post(url, data=json.dumps(params))
+            while count == per_page:
+                params = {
+                    'q': {"_and": [{input_type: item}, criteria]},
+                    'f': fields,
+                    'o': {"per_page": per_page, "page": page}
+                    }
 
-            if 400 <= r.status_code <= 499:
-                print("Client error when querying for value {}".format(item))
-            elif r.status_code >= 500:
-                print("Server error when querying for value {}. You may be exceeding the maximum API request size (1GB).".format(item))
-            elif json.loads(r.text)['count'] != 0:
-                    outp = open(os.path.join(directory, q + '_' + \
-                                str(results_found) + '.json'), 'w')
-                    print(r.text, end = '', file=outp)
-                    outp.close()
-                    results_found += 1
+                #print(json.dumps(params))
+                r = requests.post(url, data=json.dumps(params))
+               
+                page += 1
+                count = 0
+                #print(r.text)
+                if 400 <= r.status_code <= 499:
+                    print("Client error when querying for value {}".format(item))
+                elif r.status_code >= 500:
+                    print("Server error when querying for value {}. You may be exceeding the maximum API request size (1GB).".format(item))
+                else:
+                    count = json.loads(r.text)['count']
+                    if count != 0:
+                        outp = open(os.path.join(directory, q + '_' + \
+                        str(results_found) + '.json'), 'w')
+                        print(r.text, end = '', file=outp)
+                        outp.close()
+                        results_found += 1
+            # Added line: Reset count so if there is a list of items, it processes full list
+            count = per_page    
 
+        
         if results_found == 0:
             print("Query {} returned no results".format(q))
         else:
             # Output merged CSV of formatted results.
             json_to_csv.main(directory, q, results_found)
-
             # Clean csv: reorder columns, drop duplicates, sort, then save
-            output_filename = os.path.join(directory, q+'.csv')
+            output_filename = os.path.join(directory, q +'.csv')
             df = pd.read_csv(output_filename, dtype=object, encoding='Latin-1')
             df = df[fields].drop_duplicates().sort_values(by=sort_fields,
                     ascending=[direction != 'desc' for direction in sort_directions])
