@@ -50,16 +50,17 @@ def query(configfile):
         criteria = {"_and": [json.loads(parser.get(q, option)) for option in
                         parser.options(q) if option.startswith('criteria')]}
 
-        item_list = list(set(open(os.path.join(directory, input_file)).read().split('\n')))
+        # remove the last line's carriage return
+        item_list = list(set(open(os.path.join(directory, input_file)).read().rstrip('\n').split('\n')))
         results_found = 0
 
         item_list_len = len(item_list)
         # request the maximum of 10000 matches per query and page forward as necessary
         per_page = 10000
-        page = 1
 
         for item in item_list:
             count = per_page
+            page = 1
             while count == per_page:
                 params = {
                     'q': {"_and": [{input_type: item}, criteria]},
