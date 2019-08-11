@@ -55,12 +55,12 @@ def query(configfile):
 
         item_list_len = len(item_list)
         # request the maximum of 10000 matches per query and page forward as necessary
-        count = per_page = 10000
+        count = 10000
+        per_page = 10000
         page = 1
-        #print(item_list_len)
-        #print(item_list)
+     
         for item in item_list:
-            print("item is", item)
+            
             while count == per_page:
                 params = {
                     'q': {"_and": [{input_type: item}, criteria]},
@@ -68,12 +68,12 @@ def query(configfile):
                     'o': {"per_page": per_page, "page": page}
                     }
 
-                #print(json.dumps(params))
+                
                 r = requests.post(url, data=json.dumps(params))
                
                 page += 1
                 count = 0
-                #print(r.text)
+       
                 if 400 <= r.status_code <= 499:
                     print("Client error when querying for value {}".format(item))
                 elif r.status_code >= 500:
@@ -86,7 +86,8 @@ def query(configfile):
                         print(r.text, end = '', file=outp)
                         outp.close()
                         results_found += 1
-            # Added line: Reset count so if there is a list of items, it processes full list
+
+            # Reset count so if there is a list of items, full list is processed
             count = per_page    
 
         
