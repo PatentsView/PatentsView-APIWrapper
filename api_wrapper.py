@@ -20,7 +20,7 @@ def query(configfile):
 
         # Parse parameters from config file
         entity = json.loads(parser.get(q, 'entity'))
-        url = 'http://www.patentsview.org/api/'+entity+'/query?'
+        url = 'https://www.patentsview.org/api/'+entity+'/query?'
 
         input_file = json.loads(parser.get(q, 'input_file'))
         directory = json.loads(parser.get(q, 'directory'))
