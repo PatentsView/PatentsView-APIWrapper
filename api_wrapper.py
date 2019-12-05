@@ -20,7 +20,7 @@ def query(configfile):
 
         # Parse parameters from config file
         entity = json.loads(parser.get(q, 'entity'))
-        url = 'http://www.patentsview.org/api/'+entity+'/query?'
+        url = 'https://www.patentsview.org/api/'+entity+'/query?'
 
         input_file = json.loads(parser.get(q, 'input_file'))
         directory = json.loads(parser.get(q, 'directory'))
@@ -50,29 +50,40 @@ def query(configfile):
         criteria = {"_and": [json.loads(parser.get(q, option)) for option in
                         parser.options(q) if option.startswith('criteria')]}
 
-        item_list = list(set(open(os.path.join(directory, input_file)).read().split('\n')))
+        # remove the last line's carriage return
+        item_list = list(set(open(os.path.join(directory, input_file)).read().rstrip('\n').split('\n')))
         results_found = 0
 
         item_list_len = len(item_list)
+        # request the maximum of 10000 matches per query and page forward as necessary
+        per_page = 10000
 
         for item in item_list:
-            params = {
-                'q': {"_and": [{input_type: item}, criteria]},
-                'f': fields 
-                }
+            count = per_page
+            page = 1
+            while count == per_page:
+                params = {
+                    'q': {"_and": [{input_type: item}, criteria]},
+                    'f': fields,
+                    'o': {"per_page": per_page, "page": page}
+                    }
 
-            r = requests.post(url, data=json.dumps(params))
+                r = requests.post(url, data=json.dumps(params))
+                page += 1
+                count = 0
 
-            if 400 <= r.status_code <= 499:
-                print("Client error when quering for value {}".format(item))
-            elif r.status_code >= 500:
-                print("Server error when quering for value {}. You may be exceeding the maximum API request size (1GB).".format(item))
-            elif json.loads(r.text)['count'] != 0:
-                    outp = open(os.path.join(directory, q + '_' + \
+                if 400 <= r.status_code <= 499:
+                    print("Client error when quering for value {}".format(item))
+                elif r.status_code >= 500:
+                    print("Server error when quering for value {}. You may be exceeding the maximum API request size (1GB).".format(item))
+                else:
+                    count = json.loads(r.text)['count'] 
+                    if count != 0:
+                            outp = open(os.path.join(directory, q + '_' + \
                                 str(results_found) + '.json'), 'w')
-                    print(r.text, end = '', file=outp)
-                    outp.close()
-                    results_found += 1
+                            print(r.text, end = '', file=outp)
+                            outp.close()
+                            results_found += 1
 
         if results_found == 0:
             print("Query {} returned no results".format(q))
