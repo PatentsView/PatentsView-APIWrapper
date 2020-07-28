@@ -99,6 +99,12 @@ To sort first by patent_date (descending), and then by patent title (ascending):
 
 The API wrapper is currently compatible with Python 3.
 
+## License
+
+Users are free to use, share, or adapt the material for any purpose, subject to the standards of the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+
+Attribution should be given to PatentsView for use, distribution, or derivative works.
+
 ## See also
 
 [USPTO PatentsView](http://www.patentsview.org/web/#viz/relationships)
