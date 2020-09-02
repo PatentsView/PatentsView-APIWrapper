@@ -20,7 +20,7 @@ def query(configfile):
 
         # Parse parameters from config file
         entity = json.loads(parser.get(q, 'entity'))
-        url = 'http://www.patentsview.org/api/'+entity+'/query?'
+        url = 'https://api.patentsview.org/'+entity+'/query?'
 
         input_file = json.loads(parser.get(q, 'input_file'))
         directory = json.loads(parser.get(q, 'directory'))
@@ -65,6 +65,7 @@ def query(configfile):
 
             if 400 <= r.status_code <= 499:
                 print("Client error when quering for value {}".format(item))
+                print(url)
             elif r.status_code >= 500:
                 print("Server error when quering for value {}. You may be exceeding the maximum API request size (1GB).".format(item))
             elif json.loads(r.text)['count'] != 0:

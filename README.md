@@ -57,7 +57,7 @@ For OSX/Unix systems:
 
 ### Input Type
 The type of object represented in the input file. The full list of 
-input types can be found in the [PatentsView API Documentation](http://www.patentsview.org/api/doc.html). 
+input types can be found in the [PatentsView API Documentation](https://api.patentsview.org/doc.html). 
 Common input types include:
 
 ```
@@ -70,7 +70,7 @@ Common input types include:
 ```
 
 ### Fields
-The fields that will be returned in the results. Valid fields for each endpoint can be found in the [PatentsView API Documentation](http://www.patentsview.org/api/doc.html). Fields should be specified as an array of strings, such as:
+The fields that will be returned in the results. Valid fields for each endpoint can be found in the [PatentsView API Documentation](https://api.patentsview.org/doc.html). Fields should be specified as an array of strings, such as:
 
 ```fields = ["patent_number", "patent_title", "patent_date"]```
 
@@ -101,8 +101,8 @@ The API wrapper is currently compatible with Python 3.
 
 ## See also
 
-[USPTO PatentsView](http://www.patentsview.org/web/#viz/relationships)
+[USPTO PatentsView](https://www.patentsview.org/web/#viz/relationships)
 
-[PatentsView API](http://www.patentsview.org/api/doc.html)
+[PatentsView API](https://api.patentsview.org/doc.html)
 
-[PatentsView Query Language](http://www.patentsview.org/api/query-language.html)
+[PatentsView Query Language](https://api.patentsview.org/query-language.html)
