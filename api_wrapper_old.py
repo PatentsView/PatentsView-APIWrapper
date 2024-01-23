@@ -22,10 +22,11 @@ def query(configfile):
         entity = json.loads(parser.get(q, 'entity'))
         url = 'https://api.patentsview.org/'+entity+'/query?'
 
-        #input_file = json.loads(parser.get(q, 'input_file'))
+        input_file = json.loads(parser.get(q, 'input_file'))
         directory = json.loads(parser.get(q, 'directory'))
-        #input_type = json.loads(parser.get(q, 'input_type'))
+        input_type = json.loads(parser.get(q, 'input_type'))
         fields = json.loads(parser.get(q, 'fields'))
+
 
         try:
             # If specified, 'sort' should be a list of dictionaries, specifying 
@@ -50,39 +51,39 @@ def query(configfile):
                         parser.options(q) if option.startswith('criteria')]}
 
         # remove the last line's carriage return
-        #item_list = list(set(open(os.path.join(directory, input_file)).read().rstrip('\n').split('\n')))
+        item_list = list(set(open(os.path.join(directory, input_file)).read().rstrip('\n').split('\n')))
         results_found = 0
 
-        #item_list_len = len(item_list)
+        item_list_len = len(item_list)
         # request the maximum of 10000 matches per query and page forward as necessary
         per_page = 10000
 
-        #for item in item_list:
-        count = per_page
-        page = 1
-        while count == per_page:
-            params = {
-                'q': {"_and": [criteria]},
-                'f': fields,
-                'o': {"per_page": per_page, "page": page}
-                }
-            print(params)
-            r = requests.post(url, data=json.dumps(params))
-            page += 1
-            count = 0
+        for item in item_list:
+            count = per_page
+            page = 1
+            while count == per_page:
+                params = {
+                    'q': {"_and": [{input_type: item}, criteria]},
+                    'f': fields,
+                    'o': {"per_page": per_page, "page": page}
+                    }
+                print(params)
+                r = requests.post(url, data=json.dumps(params))
+                page += 1
+                count = 0
 
-            if 400 <= r.status_code <= 499:
-                print("Client error when quering")
-            elif r.status_code >= 500:
-                print("Server error when quering. You may be exceeding the maximum API request size (1GB).")
-            else:
-                count = json.loads(r.text)['count']
-                if count != 0:
-                        outp = open(os.path.join(directory, q + '_' + \
-                            str(results_found) + '.json'), 'w')
-                        print(r.text, end = '', file=outp)
-                        outp.close()
-                        results_found += 1
+                if 400 <= r.status_code <= 499:
+                    print("Client error when quering for value {}".format(item))
+                elif r.status_code >= 500:
+                    print("Server error when quering for value {}. You may be exceeding the maximum API request size (1GB).".format(item))
+                else:
+                    count = json.loads(r.text)['count']
+                    if count != 0:
+                            outp = open(os.path.join(directory, q + '_' + \
+                                str(results_found) + '.json'), 'w')
+                            print(r.text, end = '', file=outp)
+                            outp.close()
+                            results_found += 1
 
         if results_found == 0:
             print("Query {} returned no results".format(q))
@@ -95,8 +96,6 @@ def query(configfile):
             df = pd.read_csv(output_filename, dtype=object, encoding='Latin-1')
             df = df[fields].drop_duplicates().sort_values(by=sort_fields,
                     ascending=[direction != 'desc' for direction in sort_directions])
-            # df = df.drop_duplicates().sort_values(by=sort_fields,
-            #          ascending=[direction != 'desc' for direction in sort_directions])
             df.to_csv(output_filename, index=False)
             print('({} rows returned)'.format(len(df)))
 
