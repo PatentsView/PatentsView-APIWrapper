@@ -93,10 +93,10 @@ def query(configfile):
             # Clean csv: reorder columns, drop duplicates, sort, then save
             output_filename = os.path.join(directory, q+'.csv')
             df = pd.read_csv(output_filename, dtype=object, encoding='Latin-1')
-            df = df[fields].drop_duplicates().sort_values(by=sort_fields,
-                    ascending=[direction != 'desc' for direction in sort_directions])
-            # df = df.drop_duplicates().sort_values(by=sort_fields,
-            #          ascending=[direction != 'desc' for direction in sort_directions])
+            # df = df[fields].drop_duplicates().sort_values(by=sort_fields,
+            #         ascending=[direction != 'desc' for direction in sort_directions])
+            df = df.drop_duplicates().sort_values(by=sort_fields,
+                     ascending=[direction != 'desc' for direction in sort_directions])
             df.to_csv(output_filename, index=False)
             print('({} rows returned)'.format(len(df)))
 
