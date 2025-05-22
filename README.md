@@ -1,3 +1,6 @@
+# Archival Notice
+**NOTICE**: The PatentsView Legacy API has been discontinued as of May 1, 2025 and any requests made to api.patentsview.org will return a “410 Gone” code. Consequently, the API wrapper has been discontinued and set to archival mode. We encourage all users to transition to the new PatentSearch API for continued access to our API services. Refer to the [code examples](https://github.com/PatentsView/PatentsView-Code-Examples/) for example snippets or read more about the transition in this [blog post](https://patentsview.org/data-in-action/patentsview-ends-support-legacy-api).
+
 PatentsView API Wrapper
 ===================================
 
